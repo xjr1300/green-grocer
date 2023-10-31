@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 
 pub mod primitives;
+pub mod sales;
 
 #[derive(thiserror::Error, Debug)]
 pub enum DomainError {
