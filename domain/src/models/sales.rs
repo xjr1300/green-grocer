@@ -1,39 +1,14 @@
-use std::fmt;
-use std::hash::{Hash, Hasher};
+use std::hash::Hash;
 
 use time::OffsetDateTime;
+use uuid::Uuid;
 
-use super::primitives::EntityId;
+use macros::EntityId;
 
 /// 販売ID
-pub type SaleId = EntityId<Sale>;
-
-impl Clone for SaleId {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-
-impl Copy for SaleId {}
-
-impl PartialEq for SaleId {
-    fn eq(&self, other: &Self) -> bool {
-        self.value().eq(&other.value())
-    }
-}
-
-impl Eq for SaleId {}
-
-impl Hash for SaleId {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        self.value().hash(state);
-    }
-}
-
-impl fmt::Debug for SaleId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "SaleId({})", self.value())
-    }
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, EntityId)]
+pub struct SaleId {
+    value: Uuid,
 }
 
 /// 販売
