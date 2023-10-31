@@ -3,5 +3,21 @@
 version = 3
 
 [[package]]
-name = "green-grocer"
+name = "controller"
+version = "0.1.0"
+
+[[package]]
+name = "domain"
+version = "0.1.0"
+
+[[package]]
+name = "infrastructure"
+version = "0.1.0"
+
+[[package]]
+name = "usecase"
+version = "0.1.0"
+
+[[package]]
+name = "web"
 version = "0.1.0"

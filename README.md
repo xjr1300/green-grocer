@@ -43,3 +43,24 @@
 * お客さんは、購入した野菜をすべて返品することで、購入をキャンセルできる。
   * `打ち上げ`をキャンセルする。
 * 八百屋に野菜の在庫が無限にあるとする（欠品なし、話を簡単にするために`在庫`の概念を持たない。）。
+
+## コンポーネント
+
+上位コンポーネントから下位コンポーネントに向かって次の通り示す。
+
+* domain
+* usecase
+* infrastructure
+* controller
+* web
+
+```bash
+cargo new --bin web
+cargo new --lib controller
+cargo new --lib infrastructure
+cargo new --lib usecase
+cargo new --lib domain
+```
+
+なお、下位コンポーネントは上位コンポーネントに依存して、上位コンポーネントは下位コンポーネントに依存しない。
+これを、ワークスペースを構成することで制約する。
