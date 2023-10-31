@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  db:
+    # コンテナ名
+    container_name: green-grocer-db
+    # コンテナイメージを指定
+    image: xjr1300/postgres16-postgis34:latest
+    # ポート番号を設定
+    ports:
+      - 5432:5432
+    # ボリュームを永続化
+    volumes:
+      - postgres-db-data:/var/lib/postgresql/data
+    # 環境変数ファイルを指定
+    env_file:
+      - .env
+    # ヘルスチェック
+    healthcheck:
+      # コンテナ内で実行するコマンド
+      test: psql -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c '\q'
+      # ヘルスチェックの間隔
+      interval: 10s
+      # ヘルスチェックのタイムアウト
+      timeout: 5s
+      # ヘルスチェックのリトライ回数
+      retries: 5
+
+volumes:
+  postgres-db-data:
