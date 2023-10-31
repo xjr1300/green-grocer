@@ -5,7 +5,7 @@ use uuid::Uuid;
 use super::DomainError;
 
 /// エンティティID構造体
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct EntityId<T> {
     value: Uuid,
     _marker: PhantomData<T>,
