@@ -1,1 +1,1 @@
-pub mod vegetable_repository;
+pub mod vegetable;

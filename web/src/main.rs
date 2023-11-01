@@ -3,7 +3,7 @@ use sqlx::postgres::PgPoolOptions;
 
 use controller::health_check::health_check;
 use domain::repositories::RepositoryContainer;
-use infrastructure::postgres::repositories::vegetable_repository::PgVegetableRepository;
+use infrastructure::postgres::repositories::vegetable::PgVegetableRepository;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
