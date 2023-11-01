@@ -102,4 +102,7 @@ curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72
 curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "unitPrice": 80}' http://localhost:8001/api/vegetables
 # 何も更新しない
 curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4"}' http://localhost:8001/api/vegetables
+
+# 野菜を削除
+curl -X DELETE http://localhost:8001/api/vegetables/953c73a3-0c55-4e72-8288-bbd69b8b70a4
 ```

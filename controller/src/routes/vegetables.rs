@@ -18,6 +18,7 @@ where
         .route("", web::put().to(update::<VR>))
         .route("", web::patch().to(partial_update::<VR>))
         .route("/{id}", web::get().to(find_by_id::<VR>))
+        .route("/{id}", web::delete().to(delete::<VR>))
 }
 
 /// 野菜をすべて検索するハンドラ関数
@@ -172,7 +173,7 @@ struct PlainPartialVegetable {
     /// 野菜名
     pub name: Option<String>,
     /// 単価
-    pub unit_price: Option<i32>,
+    pub unit_price: Option<u32>,
 }
 
 impl From<PlainPartialVegetable> for PartialVegetable {
@@ -215,4 +216,29 @@ where
     let vegetable: PlainVegetable = vegetable.unwrap().into();
 
     Ok(HttpResponse::Ok().json(vegetable))
+}
+
+/// 野菜をIDを指定して削除する関数
+///
+/// [DELETE] http://localhost:8001/api/vegetables/{id}
+///
+///
+/// * `repo_container` - リポジトリコンテナ
+/// * `id` - 野菜ID
+///
+/// # 戻り値
+///
+/// レスポンス
+async fn delete<VR>(
+    repo_container: web::Data<RepositoryContainer<VR>>,
+    path: web::Path<(String,)>,
+) -> HandlerReturnType
+where
+    VR: VegetableRepository,
+{
+    let id: VegetableId = VegetableId::try_from(path.into_inner().0.as_str()).map_err(e400)?;
+    match repo_container.vegetable.delete(id).await.map_err(e500)? {
+        0 => Err(e404()),
+        _ => Ok(HttpResponse::Ok().finish()),
+    }
 }
