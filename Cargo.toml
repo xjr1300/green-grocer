@@ -1,2 +1,3 @@
 [workspace]
-members = ["web", "controller", "infrastructure", "usecase", "domain"]
+members = ["macros", "web", "controller", "infrastructure", "usecase", "domain"]
+resolver = "2"

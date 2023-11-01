@@ -1,14 +1,9 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+pub mod models;
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+use std::borrow::Cow;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+#[derive(thiserror::Error, Debug)]
+pub enum DomainError {
+    #[error("ドメインルール違反: {0}")]
+    Rule(Cow<'static, str>),
 }
