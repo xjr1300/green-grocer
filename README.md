@@ -24,13 +24,18 @@
 
 ## 集約、エンティティ、値オブジェクト
 
-* 販売
+* `野菜`集約
+  * 野菜を管理する集約
+* `野菜`エンティティ
+  * `野菜`集約の集約ルート（ルートエンティティ）
+  * 野菜のID、名前、単価などをフィールドに持つ
+* `販売`集約
   * 販売全体の情報と、個々の野菜を販売した実績を示す販売明細を管理する集約
   * ルートエンティティは`販売`
-* 販売
+* `販売`エンティティ
   * `販売`集約の集約ルート（ルートエンティティ）
   * 販売日時、販売明細（複数）、合計販売金額などをフィールドに持つ
-* 販売明細
+* `販売明細`値オブジェクト
   * 販売した野菜、単価、数量、小計などをフィールドに持つ値オブジェクト
 
 ## ドメインルール
@@ -56,16 +61,28 @@
 
 ## コンポーネント
 
-上位コンポーネントから下位コンポーネントに向かって次の通り示す。
-なお、下位コンポーネントは上位コンポーネントに依存して、上位コンポーネントは下位コンポーネントに依存しない。
+* コンポーネントを上位コンポーネントから次に示す。
+  * `domain`
+  * `usecase`
+  * `infrastructure`
+  * `controller`
+  * `web`
+* 上位コンポーネントは、下位コンポーネントに依存される。上位コンポーネントは、下位コンポーネントに依存しない。
 
-* domain
-* usecase
-* infrastructure
-* controller
-* web
+### 依存の方向
 
-これを、ワークスペースを構成することで制約する。
+```text
+domain <- usecase <- infrastructure <- controller <- web
+```
+
+実装を簡略化するために、`infrastructure`で使用するプレインなオブジェクトを、`controller`でレスポンスを返却するときに使用している。
+このため、`controller`は、`infrastructure`に依存している。
+
+> 本来であれば、各層でオブジェクトを受け渡すDTOを定義するべき。
+
+### 依存方向の制約
+
+この依存方向をワークスペースを構成することで制約する。
 
 ```bash
 cargo new --bin web
@@ -73,4 +90,46 @@ cargo new --lib controller
 cargo new --lib infrastructure
 cargo new --lib usecase
 cargo new --lib domain
+```
+
+## ユースケース
+
+* `野菜`集約のユースケースは単純なため、`usecase`に実装せず、`controller`に実装した。
+
+## リクエスト
+
+### ヘルスチェック
+
+```bash
+# ヘルスチェック
+curl http://localhost:8001/health-check
+``````
+
+### 野菜ユースケース
+
+```bash
+# 野菜をすべて取得
+curl http://localhost:8001/api/vegetables
+
+# 野菜を登録
+curl -X POST -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "トマト", "unitPrice": 100}' http://localhost:8001/api/vegetables
+
+# 野菜をIDを指定して取得
+curl http://localhost:8001/api/vegetables/953c73a3-0c55-4e72-8288-bbd69b8b70a4
+
+# 野菜を更新
+curl -X PUT -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "キュウリ", "unitPrice": 30}' http://localhost:8001/api/vegetables
+
+# 野菜を部分更新
+# 名前と単価を更新
+curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "ナス", "unitPrice": 70}' http://localhost:8001/api/vegetables
+# 名前のみ更新
+curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "ダイコン"}' http://localhost:8001/api/vegetables
+# 価格を更新
+curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "unitPrice": 80}' http://localhost:8001/api/vegetables
+# 何も更新しない
+curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4"}' http://localhost:8001/api/vegetables
+
+# 野菜を削除
+curl -X DELETE http://localhost:8001/api/vegetables/953c73a3-0c55-4e72-8288-bbd69b8b70a4
 ```

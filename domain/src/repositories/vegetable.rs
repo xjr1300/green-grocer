@@ -25,7 +25,7 @@ pub struct PartialVegetable {
 
 /// 野菜リポジトリ
 #[async_trait]
-pub trait VegetableRepository {
+pub trait VegetableRepository: Send + Sync + 'static {
     /// 野菜IDで指定した野菜を検索する。
     async fn find_by_id(&self, id: VegetableId) -> anyhow::Result<Option<Vegetable>>;
     /// すべての野菜を検索する。
