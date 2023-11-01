@@ -5,7 +5,7 @@ edition = "2021"
 
 [dependencies]
 anyhow = "1.0.*"
-async-trait = "0.1.74"
+async-trait = "0.1.*"
 domain = { path = "../domain" }
 sqlx = { version = "0.7.*", features = [
     "runtime-tokio-rustls",
