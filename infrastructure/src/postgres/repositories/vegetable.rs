@@ -114,6 +114,7 @@ impl VegetableRepository for PgVegetableRepository {
     ///
     /// 登録した野菜
     async fn register(&self, vegetable: UpsertVegetable) -> anyhow::Result<Vegetable> {
+        let id = Uuid::new_v4();
         let mut tx = self.pool.begin().await?;
         let veg = {
             sqlx::query_as!(
@@ -123,7 +124,7 @@ impl VegetableRepository for PgVegetableRepository {
                 VALUES ($1, $2, $3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 RETURNING id, name, unit_price, created_at, updated_at
                 "#,
-                vegetable.id.value(),
+                id,
                 &vegetable.name,
                 vegetable.unit_price.value() as i32,
             )
@@ -139,12 +140,17 @@ impl VegetableRepository for PgVegetableRepository {
     ///
     /// # 引数
     ///
+    /// * `id` - 更新する野菜の野菜ID
     /// * `vegetable` - 更新する野菜
     ///
     /// # 戻り値
     ///
     /// 更新した野菜
-    async fn update(&self, vegetable: UpsertVegetable) -> anyhow::Result<Option<Vegetable>> {
+    async fn update(
+        &self,
+        id: VegetableId,
+        vegetable: UpsertVegetable,
+    ) -> anyhow::Result<Option<Vegetable>> {
         let mut tx = self.pool.begin().await?;
         let veg = {
             sqlx::query_as!(
@@ -155,7 +161,7 @@ impl VegetableRepository for PgVegetableRepository {
                 WHERE id = $1
                 RETURNING id, name, unit_price, created_at, updated_at
                 "#,
-                vegetable.id.value(),
+                id.value(),
                 &vegetable.name,
                 vegetable.unit_price.value() as i32,
             )
@@ -174,6 +180,7 @@ impl VegetableRepository for PgVegetableRepository {
     ///
     /// # 引数
     ///
+    /// * `id` - 部分更新する野菜の野菜ID
     /// * `vegetable` - 部分更新する野菜
     ///
     /// # 戻り値
@@ -181,10 +188,11 @@ impl VegetableRepository for PgVegetableRepository {
     /// 部分更新した野菜
     async fn partial_update(
         &self,
+        id: VegetableId,
         vegetable: PartialVegetable,
     ) -> anyhow::Result<Option<Vegetable>> {
         if vegetable.name.is_none() && vegetable.unit_price.is_none() {
-            return self.find_by_id(vegetable.id).await;
+            return self.find_by_id(id).await;
         }
         let mut builder: QueryBuilder<Postgres> = QueryBuilder::new("UPDATE vegetables SET");
         if let Some(name) = &vegetable.name {
@@ -199,7 +207,7 @@ impl VegetableRepository for PgVegetableRepository {
         }
         builder.push(" updated_at = CURRENT_TIMESTAMP");
         builder.push(" WHERE id = ");
-        builder.push_bind(vegetable.id.value());
+        builder.push_bind(id.value());
         builder.push(" RETURNING id, name, unit_price, created_at, updated_at");
 
         let mut tx = self.pool.begin().await?;

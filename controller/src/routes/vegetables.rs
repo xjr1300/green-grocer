@@ -1,8 +1,7 @@
 use actix_web::{web, HttpResponse, Scope};
-use domain::models::primitives::Price;
-use uuid::Uuid;
 
 use super::{e400, e404, e500, HandlerReturnType};
+use domain::models::primitives::Price;
 use domain::models::vegetable::VegetableId;
 use domain::repositories::vegetable::{PartialVegetable, UpsertVegetable, VegetableRepository};
 use domain::repositories::RepositoryContainer;
@@ -15,9 +14,9 @@ where
     web::scope("/api/vegetables")
         .route("", web::get().to(find_all::<VR>))
         .route("", web::post().to(register::<VR>))
-        .route("", web::put().to(update::<VR>))
-        .route("", web::patch().to(partial_update::<VR>))
         .route("/{id}", web::get().to(find_by_id::<VR>))
+        .route("/{id}", web::put().to(update::<VR>))
+        .route("/{id}", web::patch().to(partial_update::<VR>))
         .route("/{id}", web::delete().to(delete::<VR>))
 }
 
@@ -84,8 +83,6 @@ where
 #[derive(serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct PlainUpsertVegetable {
-    /// 野菜ID
-    pub id: Uuid,
     /// 野菜名
     pub name: String,
     /// 単価
@@ -95,7 +92,6 @@ struct PlainUpsertVegetable {
 impl From<PlainUpsertVegetable> for UpsertVegetable {
     fn from(value: PlainUpsertVegetable) -> Self {
         Self {
-            id: value.id.into(),
             name: value.name,
             unit_price: value.unit_price.into(),
         }
@@ -134,7 +130,7 @@ where
 
 /// 野菜を更新するハンドラ関数
 ///
-/// [PUT] http://localhost:8001/api/vegetables
+/// [PUT] http://localhost:8001/api/vegetables/{id}
 ///
 ///
 /// * `repo_container` - リポジトリコンテナ
@@ -145,15 +141,17 @@ where
 /// レスポンス
 async fn update<VR>(
     repo_container: web::Data<RepositoryContainer<VR>>,
+    path: web::Path<(String,)>,
     vegetable: web::Json<PlainUpsertVegetable>,
 ) -> HandlerReturnType
 where
     VR: VegetableRepository,
 {
+    let id: VegetableId = VegetableId::try_from(path.into_inner().0.as_str()).map_err(e400)?;
     let vegetable: UpsertVegetable = vegetable.into_inner().into();
     let vegetable = repo_container
         .vegetable
-        .update(vegetable)
+        .update(id, vegetable)
         .await
         .map_err(e500)?;
     if vegetable.is_none() {
@@ -168,8 +166,6 @@ where
 #[derive(serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct PlainPartialVegetable {
-    /// 野菜ID
-    pub id: Uuid,
     /// 野菜名
     pub name: Option<String>,
     /// 単価
@@ -179,16 +175,15 @@ struct PlainPartialVegetable {
 impl From<PlainPartialVegetable> for PartialVegetable {
     fn from(value: PlainPartialVegetable) -> Self {
         Self {
-            id: VegetableId::from(value.id),
             name: value.name,
-            unit_price: value.unit_price.map(|p| Price::from(p as u32)),
+            unit_price: value.unit_price.map(Price::from),
         }
     }
 }
 
 /// 野菜を部分更新するハンドラ関数
 ///
-/// [PATCH] http://localhost:8001/api/vegetables
+/// [PATCH] http://localhost:8001/api/vegetables/{id}
 ///
 ///
 /// * `repo_container` - リポジトリコンテナ
@@ -199,15 +194,17 @@ impl From<PlainPartialVegetable> for PartialVegetable {
 /// レスポンス
 async fn partial_update<VR>(
     repo_container: web::Data<RepositoryContainer<VR>>,
+    path: web::Path<(String,)>,
     vegetable: web::Json<PlainPartialVegetable>,
 ) -> HandlerReturnType
 where
     VR: VegetableRepository,
 {
+    let id: VegetableId = VegetableId::try_from(path.into_inner().0.as_str()).map_err(e400)?;
     let vegetable: PartialVegetable = vegetable.into_inner().into();
     let vegetable = repo_container
         .vegetable
-        .partial_update(vegetable)
+        .partial_update(id, vegetable)
         .await
         .map_err(e500)?;
     if vegetable.is_none() {
