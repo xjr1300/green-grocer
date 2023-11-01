@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS vegetables (
     name VARCHAR(80) NOT NULL,
     unit_price INTEGER NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (id)
 );
 -- 販売テーブル作成
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS sales (
     sold_at TIMESTAMP WITH TIME ZONE NOT NULL,
     total_price INTEGER NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (id)
 );
 -- 販売明細テーブル作成
