@@ -10,6 +10,7 @@ use domain::repositories::vegetable_repository::{
 };
 
 /// PostgreSQL用の野菜リポジトリ
+#[derive(Clone, Debug)]
 pub struct PgVegetableRepository {
     pool: PgPool,
 }
@@ -34,6 +35,12 @@ impl From<PlainVegetable> for Vegetable {
             value.created_at,
             value.updated_at,
         )
+    }
+}
+
+impl PgVegetableRepository {
+    pub fn new(pool: PgPool) -> Self {
+        Self { pool }
     }
 }
 

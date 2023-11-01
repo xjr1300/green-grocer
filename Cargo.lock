@@ -2084,7 +2084,9 @@ dependencies = [
  "actix-web",
  "anyhow",
  "controller",
+ "domain",
  "dotenvy",
+ "infrastructure",
  "sqlx",
  "tokio",
 ]
