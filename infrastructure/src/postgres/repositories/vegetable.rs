@@ -190,10 +190,12 @@ impl VegetableRepository for PgVegetableRepository {
         if let Some(name) = &vegetable.name {
             builder.push(" name = ");
             builder.push_bind(name);
+            builder.push(", ");
         }
         if let Some(unit_price) = vegetable.unit_price {
             builder.push(" unit_price = ");
             builder.push_bind(unit_price.value() as i32);
+            builder.push(", ");
         }
         builder.push(" updated_at = CURRENT_TIMESTAMP");
         builder.push(" WHERE id = ");

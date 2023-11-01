@@ -92,4 +92,14 @@ curl http://localhost:8001/api/vegetables/953c73a3-0c55-4e72-8288-bbd69b8b70a4
 
 # 野菜を更新
 curl -X PUT -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "キュウリ", "unitPrice": 30}' http://localhost:8001/api/vegetables
+
+# 野菜を部分更新
+# 名前と単価を更新
+curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "ナス", "unitPrice": 70}' http://localhost:8001/api/vegetables
+# 名前のみ更新
+curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "ダイコン"}' http://localhost:8001/api/vegetables
+# 価格を更新
+curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "unitPrice": 80}' http://localhost:8001/api/vegetables
+# 何も更新しない
+curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4"}' http://localhost:8001/api/vegetables
 ```

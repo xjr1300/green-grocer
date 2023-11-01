@@ -1,9 +1,10 @@
 use actix_web::{web, HttpResponse, Scope};
+use domain::models::primitives::Price;
 use uuid::Uuid;
 
 use super::{e400, e404, e500, HandlerReturnType};
 use domain::models::vegetable::VegetableId;
-use domain::repositories::vegetable::{UpsertVegetable, VegetableRepository};
+use domain::repositories::vegetable::{PartialVegetable, UpsertVegetable, VegetableRepository};
 use domain::repositories::RepositoryContainer;
 use infrastructure::postgres::repositories::vegetable::PlainVegetable;
 
@@ -15,6 +16,7 @@ where
         .route("", web::get().to(find_all::<VR>))
         .route("", web::post().to(register::<VR>))
         .route("", web::put().to(update::<VR>))
+        .route("", web::patch().to(partial_update::<VR>))
         .route("/{id}", web::get().to(find_by_id::<VR>))
 }
 
@@ -151,6 +153,60 @@ where
     let vegetable = repo_container
         .vegetable
         .update(vegetable)
+        .await
+        .map_err(e500)?;
+    if vegetable.is_none() {
+        return Err(e404());
+    }
+    let vegetable: PlainVegetable = vegetable.unwrap().into();
+
+    Ok(HttpResponse::Ok().json(vegetable))
+}
+
+/// プレインな野菜部分更新データ
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct PlainPartialVegetable {
+    /// 野菜ID
+    pub id: Uuid,
+    /// 野菜名
+    pub name: Option<String>,
+    /// 単価
+    pub unit_price: Option<i32>,
+}
+
+impl From<PlainPartialVegetable> for PartialVegetable {
+    fn from(value: PlainPartialVegetable) -> Self {
+        Self {
+            id: VegetableId::from(value.id),
+            name: value.name,
+            unit_price: value.unit_price.map(|p| Price::from(p as u32)),
+        }
+    }
+}
+
+/// 野菜を部分更新するハンドラ関数
+///
+/// [PATCH] http://localhost:8001/api/vegetables
+///
+///
+/// * `repo_container` - リポジトリコンテナ
+/// * `vegetable` - 野菜
+///
+/// # 戻り値
+///
+/// レスポンス
+async fn partial_update<VR>(
+    repo_container: web::Data<RepositoryContainer<VR>>,
+    vegetable: web::Json<PlainPartialVegetable>,
+) -> HandlerReturnType
+where
+    VR: VegetableRepository,
+{
+    let vegetable: PartialVegetable = vegetable.into_inner().into();
+    let vegetable = repo_container
+        .vegetable
+        .partial_update(vegetable)
         .await
         .map_err(e500)?;
     if vegetable.is_none() {
