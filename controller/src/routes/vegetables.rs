@@ -14,6 +14,7 @@ where
     web::scope("/api/vegetables")
         .route("", web::get().to(find_all::<VR>))
         .route("", web::post().to(register::<VR>))
+        .route("", web::put().to(update::<VR>))
         .route("/{id}", web::get().to(find_by_id::<VR>))
 }
 
@@ -124,6 +125,38 @@ where
         .await
         .map_err(e500)?;
     let vegetable: PlainVegetable = vegetable.into();
+
+    Ok(HttpResponse::Ok().json(vegetable))
+}
+
+/// 野菜を更新するハンドラ関数
+///
+/// [PUT] http://localhost:8001/api/vegetables
+///
+///
+/// * `repo_container` - リポジトリコンテナ
+/// * `vegetable` - 野菜
+///
+/// # 戻り値
+///
+/// レスポンス
+async fn update<VR>(
+    repo_container: web::Data<RepositoryContainer<VR>>,
+    vegetable: web::Json<PlainUpsertVegetable>,
+) -> HandlerReturnType
+where
+    VR: VegetableRepository,
+{
+    let vegetable: UpsertVegetable = vegetable.into_inner().into();
+    let vegetable = repo_container
+        .vegetable
+        .update(vegetable)
+        .await
+        .map_err(e500)?;
+    if vegetable.is_none() {
+        return Err(e404());
+    }
+    let vegetable: PlainVegetable = vegetable.unwrap().into();
 
     Ok(HttpResponse::Ok().json(vegetable))
 }
