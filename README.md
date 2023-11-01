@@ -112,24 +112,24 @@ curl http://localhost:8001/health-check
 curl http://localhost:8001/api/vegetables
 
 # 野菜を登録
-curl -X POST -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "トマト", "unitPrice": 100}' http://localhost:8001/api/vegetables
+curl -X POST -H 'Content-Type: application/json' -d '{"name": "トマト", "unitPrice": 100}' http://localhost:8001/api/vegetables
 
 # 野菜をIDを指定して取得
-curl http://localhost:8001/api/vegetables/953c73a3-0c55-4e72-8288-bbd69b8b70a4
+curl http://localhost:8001/api/vegetables/{id}
 
 # 野菜を更新
-curl -X PUT -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "キュウリ", "unitPrice": 30}' http://localhost:8001/api/vegetables
+curl -X PUT -H 'Content-Type: application/json' -d '{"name": "キュウリ", "unitPrice": 30}' http://localhost:8001/api/vegetables/{id}
 
 # 野菜を部分更新
 # 名前と単価を更新
-curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "ナス", "unitPrice": 70}' http://localhost:8001/api/vegetables
+curl -X PATCH -H 'Content-Type: application/json' -d '{"name": "ナス", "unitPrice": 70}' http://localhost:8001/api/vegetables/{id}
 # 名前のみ更新
-curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "ダイコン"}' http://localhost:8001/api/vegetables
+curl -X PATCH -H 'Content-Type: application/json' -d '{"name": "ダイコン"}' http://localhost:8001/api/vegetables/{id}
 # 価格を更新
-curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "unitPrice": 80}' http://localhost:8001/api/vegetables
+curl -X PATCH -H 'Content-Type: application/json' -d '{"unitPrice": 80}' http://localhost:8001/api/vegetables/{id}
 # 何も更新しない
-curl -X PATCH -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4"}' http://localhost:8001/api/vegetables
+curl -X PATCH -H 'Content-Type: application/json' -d '{}' http://localhost:8001/api/vegetables/{id}
 
 # 野菜を削除
-curl -X DELETE http://localhost:8001/api/vegetables/953c73a3-0c55-4e72-8288-bbd69b8b70a4
+curl -X DELETE http://localhost:8001/api/vegetables/{id}
 ```

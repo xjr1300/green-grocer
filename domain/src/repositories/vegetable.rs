@@ -5,8 +5,6 @@ use crate::models::vegetable::{Vegetable, VegetableId};
 
 /// 登録または更新する野菜
 pub struct UpsertVegetable {
-    /// 野菜ID
-    pub id: VegetableId,
     /// 野菜名
     pub name: String,
     /// 単価
@@ -15,8 +13,6 @@ pub struct UpsertVegetable {
 
 /// 部分更新する野菜
 pub struct PartialVegetable {
-    /// 野菜ID
-    pub id: VegetableId,
     /// 野菜名
     pub name: Option<String>,
     /// 単価
@@ -33,10 +29,15 @@ pub trait VegetableRepository: Send + Sync + 'static {
     /// 野菜を登録する。
     async fn register(&self, vegetable: UpsertVegetable) -> anyhow::Result<Vegetable>;
     /// 野菜を更新する。
-    async fn update(&self, vegetable: UpsertVegetable) -> anyhow::Result<Option<Vegetable>>;
+    async fn update(
+        &self,
+        id: VegetableId,
+        vegetable: UpsertVegetable,
+    ) -> anyhow::Result<Option<Vegetable>>;
     /// 野菜を部分更新する。
     async fn partial_update(
         &self,
+        id: VegetableId,
         vegetable: PartialVegetable,
     ) -> anyhow::Result<Option<Vegetable>>;
     /// 野菜IDで指定した野菜を削除する。
