@@ -1,3 +1,4 @@
+use time::OffsetDateTime;
 use uuid::Uuid;
 
 use super::primitives::Price;
@@ -17,6 +18,10 @@ pub struct Vegetable {
     name: String,
     /// 単価
     unit_price: Price,
+    /// 作成日時
+    created_at: OffsetDateTime,
+    /// 更新日時
+    updated_at: Option<OffsetDateTime>,
 }
 
 impl Vegetable {
@@ -26,15 +31,24 @@ impl Vegetable {
     ///
     /// * `name` - 野菜名
     /// * `unit_price` - 単価
+    /// * `created_at` - 作成日時
+    /// * `updated_at` - 更新日時
     ///
     /// # 戻り値
     ///
     /// 野菜
-    pub fn new(name: &str, unit_price: Price) -> Self {
+    pub fn new(
+        name: &str,
+        unit_price: Price,
+        created_at: OffsetDateTime,
+        updated_at: Option<OffsetDateTime>,
+    ) -> Self {
         Self {
             id: VegetableId::default(),
             name: name.to_string(),
             unit_price,
+            created_at,
+            updated_at,
         }
     }
 
@@ -63,5 +77,23 @@ impl Vegetable {
     /// 単価
     pub fn unit_price(&self) -> Price {
         self.unit_price
+    }
+
+    /// 作成日時を返す。
+    ///
+    /// # 戻り値
+    ///
+    /// 作成日時
+    pub fn created_at(&self) -> OffsetDateTime {
+        self.created_at
+    }
+
+    /// 更新日時を返す。
+    ///
+    /// # 戻り値
+    ///
+    /// 更新日時
+    pub fn updated_at(&self) -> Option<OffsetDateTime> {
+        self.updated_at
     }
 }
