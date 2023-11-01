@@ -1,6 +1,6 @@
-pub mod vegetable_repository;
+pub mod vegetable;
 
-use self::vegetable_repository::VegetableRepository;
+use self::vegetable::VegetableRepository;
 
 /// リポジトリコンテナ
 #[derive(Clone, Debug)]
