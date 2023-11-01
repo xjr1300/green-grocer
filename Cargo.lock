@@ -396,6 +396,8 @@ dependencies = [
  "infrastructure",
  "serde",
  "serde_json",
+ "time",
+ "uuid",
 ]
 
 [[package]]

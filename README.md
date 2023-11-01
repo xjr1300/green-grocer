@@ -74,3 +74,16 @@ cargo new --lib infrastructure
 cargo new --lib usecase
 cargo new --lib domain
 ```
+
+## リクエスト
+
+```bash
+# ヘルスチェック
+curl http://localhost:8001/health-check
+
+# 野菜をすべて取得
+curl http://localhost:8001/api/vegetables
+
+# 野菜を登録
+curl -X POST -H 'Content-Type: application/json' -d '{"id": "953c73a3-0c55-4e72-8288-bbd69b8b70a4", "name": "トマト", "unitPrice": 100}' http://localhost:8001/api/vegetables
+```

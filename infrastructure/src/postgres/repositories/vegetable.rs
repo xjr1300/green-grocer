@@ -13,7 +13,8 @@ pub struct PgVegetableRepository {
     pool: PgPool,
 }
 
-#[derive(serde::Serialize, sqlx::FromRow)]
+#[derive(serde::Serialize, serde::Deserialize, sqlx::FromRow)]
+#[serde(rename_all = "camelCase")]
 pub struct PlainVegetable {
     id: Uuid,
     name: String,
