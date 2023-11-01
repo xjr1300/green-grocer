@@ -5,9 +5,7 @@ use time::OffsetDateTime;
 use uuid::Uuid;
 
 use domain::models::vegetable::{Vegetable, VegetableId};
-use domain::repositories::vegetable_repository::{
-    PartialVegetable, UpsertVegetable, VegetableRepository,
-};
+use domain::repositories::vegetable::{PartialVegetable, UpsertVegetable, VegetableRepository};
 
 /// PostgreSQL用の野菜リポジトリ
 #[derive(Clone, Debug)]
@@ -15,8 +13,8 @@ pub struct PgVegetableRepository {
     pool: PgPool,
 }
 
-#[derive(sqlx::FromRow)]
-struct PlainVegetable {
+#[derive(serde::Serialize, sqlx::FromRow)]
+pub struct PlainVegetable {
     id: Uuid,
     name: String,
     unit_price: i32,
@@ -35,6 +33,18 @@ impl From<PlainVegetable> for Vegetable {
             value.created_at,
             value.updated_at,
         )
+    }
+}
+
+impl From<Vegetable> for PlainVegetable {
+    fn from(value: Vegetable) -> Self {
+        Self {
+            id: value.id().value(),
+            name: value.name().to_string(),
+            unit_price: value.unit_price().value() as i32,
+            created_at: value.created_at(),
+            updated_at: value.updated_at(),
+        }
     }
 }
 
