@@ -21,7 +21,7 @@ pub struct Vegetable {
     /// 作成日時
     created_at: OffsetDateTime,
     /// 更新日時
-    updated_at: Option<OffsetDateTime>,
+    updated_at: OffsetDateTime,
 }
 
 impl Vegetable {
@@ -29,6 +29,7 @@ impl Vegetable {
     ///
     /// # 引数
     ///
+    /// * `id` - 野菜ID
     /// * `name` - 野菜名
     /// * `unit_price` - 単価
     /// * `created_at` - 作成日時
@@ -38,13 +39,14 @@ impl Vegetable {
     ///
     /// 野菜
     pub fn new(
+        id: VegetableId,
         name: &str,
         unit_price: Price,
         created_at: OffsetDateTime,
-        updated_at: Option<OffsetDateTime>,
+        updated_at: OffsetDateTime,
     ) -> Self {
         Self {
-            id: VegetableId::default(),
+            id,
             name: name.to_string(),
             unit_price,
             created_at,
@@ -93,7 +95,7 @@ impl Vegetable {
     /// # 戻り値
     ///
     /// 更新日時
-    pub fn updated_at(&self) -> Option<OffsetDateTime> {
+    pub fn updated_at(&self) -> OffsetDateTime {
         self.updated_at
     }
 }
