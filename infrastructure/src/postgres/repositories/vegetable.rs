@@ -19,7 +19,9 @@ pub struct PlainVegetable {
     id: Uuid,
     name: String,
     unit_price: i32,
+    #[serde(with = "time::serde::rfc3339")]
     created_at: OffsetDateTime,
+    #[serde(with = "time::serde::rfc3339")]
     updated_at: OffsetDateTime,
 }
 
