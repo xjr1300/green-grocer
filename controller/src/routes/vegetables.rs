@@ -1,7 +1,8 @@
 use actix_web::{web, HttpResponse, Scope};
 use uuid::Uuid;
 
-use super::{e500, HandlerReturnType};
+use super::{e400, e404, e500, HandlerReturnType};
+use domain::models::vegetable::VegetableId;
 use domain::repositories::vegetable::{UpsertVegetable, VegetableRepository};
 use domain::repositories::RepositoryContainer;
 use infrastructure::postgres::repositories::vegetable::PlainVegetable;
@@ -13,9 +14,12 @@ where
     web::scope("/api/vegetables")
         .route("", web::get().to(find_all::<VR>))
         .route("", web::post().to(register::<VR>))
+        .route("/{id}", web::get().to(find_by_id::<VR>))
 }
 
 /// 野菜をすべて検索するハンドラ関数
+///
+/// [GET] http://localhost:8001/api/vegetables
 ///
 /// # 引数
 ///
@@ -38,6 +42,38 @@ where
         .collect();
 
     Ok(HttpResponse::Ok().json(vegetables))
+}
+
+/// 野菜をIDで検索するハンドラ関数
+///
+/// [GET] http://localhost:8001/api/vegetables/{id}
+///
+/// # 引数
+///
+/// * `repo_container` - リポジトリコンテナ
+///
+/// # 戻り値
+///
+/// レスポンス
+async fn find_by_id<VR>(
+    repo_container: web::Data<RepositoryContainer<VR>>,
+    path: web::Path<(String,)>,
+) -> HandlerReturnType
+where
+    VR: VegetableRepository,
+{
+    let id: VegetableId = VegetableId::try_from(path.into_inner().0.as_str()).map_err(e400)?;
+    let vegetable = repo_container
+        .vegetable
+        .find_by_id(id)
+        .await
+        .map_err(e500)?;
+    if vegetable.is_none() {
+        return Err(e404());
+    }
+    let vegetable: PlainVegetable = vegetable.unwrap().into();
+
+    Ok(HttpResponse::Ok().json(vegetable))
 }
 
 /// プレインな野菜登録または更新データ
@@ -63,6 +99,8 @@ impl From<PlainUpsertVegetable> for UpsertVegetable {
 }
 
 /// 野菜を登録するハンドラ関数
+///
+/// [POST] http://localhost:8001/api/vegetables
 ///
 /// # 引数
 ///
