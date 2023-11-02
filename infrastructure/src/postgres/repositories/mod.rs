@@ -13,10 +13,9 @@ pub mod vegetable;
 ///
 /// トランザクション
 pub async fn begin_transaction(pool: &Pool<Postgres>) -> DomainResult<Transaction<'_, Postgres>> {
-    Ok(pool
-        .begin()
+    pool.begin()
         .await
-        .map_err(|e| DomainError::Unexpected(e.into()))?)
+        .map_err(|e| DomainError::Unexpected(e.into()))
 }
 
 /// トランザクションをコミットする。

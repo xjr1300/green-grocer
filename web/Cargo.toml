@@ -19,3 +19,4 @@ sqlx = { version = "0.7.*", features = [
     "time",
 ] }
 tokio = { version = "1.33.*", features = ["macros", "rt-multi-thread"] }
+usecase = { path = "../usecase" }

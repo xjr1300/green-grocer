@@ -5,6 +5,8 @@ use domain::models::vegetable::Vegetable;
 use domain::repositories::vegetable::{PartialVegetable, UpsertVegetable};
 
 /// 登録または更新する野菜
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UpsertVegetableInput {
     /// 野菜の名前
     pub name: String,
@@ -22,6 +24,8 @@ impl From<UpsertVegetableInput> for UpsertVegetable {
 }
 
 /// 部分更新する野菜
+#[derive(serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PartialVegetableInput {
     /// 野菜名
     pub name: Option<String>,
@@ -40,7 +44,7 @@ impl From<PartialVegetableInput> for PartialVegetable {
 
 /// 野菜ユースケースインタラクター
 #[async_trait]
-pub trait VegetableInteractor {
+pub trait VegetableInteractor: Clone {
     /// 野菜IDで指定された野菜を検索する。
     async fn find_by_id(&self, id: &str) -> UsecaseResult<Option<Vegetable>>;
 

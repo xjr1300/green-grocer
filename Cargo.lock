@@ -397,6 +397,7 @@ dependencies = [
  "serde",
  "serde_json",
  "time",
+ "usecase",
  "uuid",
 ]
 
@@ -915,6 +916,7 @@ dependencies = [
  "serde",
  "sqlx",
  "time",
+ "usecase",
  "uuid",
 ]
 
@@ -1037,7 +1039,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.38",
- "uuid",
 ]
 
 [[package]]
@@ -2099,6 +2100,7 @@ dependencies = [
  "anyhow",
  "async-trait",
  "domain",
+ "serde",
  "thiserror",
 ]
 
@@ -2143,6 +2145,7 @@ dependencies = [
  "infrastructure",
  "sqlx",
  "tokio",
+ "usecase",
 ]
 
 [[package]]

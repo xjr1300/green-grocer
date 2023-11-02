@@ -3,8 +3,8 @@ use sqlx::postgres::PgPoolOptions;
 
 use controller::health_check::health_check;
 use controller::routes::vegetables::vegetable_router;
-use domain::repositories::RepositoryContainer;
-use infrastructure::postgres::repositories::vegetable::PgVegetableRepository;
+use infrastructure::postgres::interactors::vegetable::PgVegetableInteractor;
+use usecase::interactors::UsecaseInteractorContainer;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -16,17 +16,17 @@ async fn main() -> anyhow::Result<()> {
     let database_url = std::env::var("DATABASE_URL")?;
     let pool = PgPoolOptions::new().connect(&database_url).await?;
 
-    let repo_container = RepositoryContainer {
-        vegetable: PgVegetableRepository::new(pool.clone()),
+    // ユースケースインタラクターコンテナを構築
+    let usecase_interactors = UsecaseInteractorContainer {
+        vegetable: PgVegetableInteractor::new(pool.clone()),
     };
 
     // Webアプリケーションサーバを起動
     HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(pool.clone()))
-            .app_data(web::Data::new(repo_container.clone()))
+            .app_data(web::Data::new(usecase_interactors.clone()))
             .service(health_check)
-            .service(vegetable_router::<PgVegetableRepository>())
+            .service(vegetable_router::<PgVegetableInteractor>())
     })
     .bind(("127.0.0.1", 8001))?
     .run()
