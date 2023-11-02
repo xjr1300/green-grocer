@@ -87,10 +87,6 @@ cargo new --lib usecase
 cargo new --lib domain
 ```
 
-## ユースケース
-
-* `野菜`集約のユースケースは単純なため、`usecase`に実装せず、`controller`に実装した。
-
 ## リクエスト
 
 ### ヘルスチェック
