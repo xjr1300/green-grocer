@@ -37,7 +37,7 @@ macro_rules! price_from_signed_integers {
             /// `DomainError::Rule`
             fn try_from(value: $target) -> Result<Self, Self::Error> {
                 if value < 0 as $target {
-                    return Err(DomainError::Rule("数量は0以上です。".into()));
+                    return Err(DomainError::Validation("数量は0以上です。".into()));
                 }
 
                 Ok(Self { 0: value as u32 })
@@ -113,7 +113,7 @@ macro_rules! quantity_from_integers {
             /// `DomainError::Rule`
             fn try_from(value: $target) -> Result<Self, Self::Error> {
                 if value < 1 as $target {
-                    return Err(DomainError::Rule("数量は1以上です。".into()));
+                    return Err(DomainError::Validation("数量は1以上です。".into()));
                 }
 
                 Ok(Self { 0: value as u32 })

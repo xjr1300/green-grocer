@@ -75,11 +75,6 @@
 domain <- usecase <- infrastructure <- controller <- web
 ```
 
-実装を簡略化するために、`infrastructure`で使用するプレインなオブジェクトを、`controller`でレスポンスを返却するときに使用している。
-このため、`controller`は、`infrastructure`に依存している。
-
-> 本来であれば、各層でオブジェクトを受け渡すDTOを定義するべき。
-
 ### 依存方向の制約
 
 この依存方向をワークスペースを構成することで制約する。
