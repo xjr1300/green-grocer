@@ -4,8 +4,10 @@ use sqlx::{Postgres, QueryBuilder};
 use time::OffsetDateTime;
 use uuid::Uuid;
 
+use super::{begin_transaction, commit_transaction};
 use domain::models::vegetable::{Vegetable, VegetableId};
 use domain::repositories::vegetable::{PartialVegetable, UpsertVegetable, VegetableRepository};
+use domain::{DomainError, DomainResult};
 
 /// PostgreSQL用の野菜リポジトリ
 #[derive(Clone, Debug)]
@@ -68,7 +70,7 @@ impl VegetableRepository for PgVegetableRepository {
     /// # 戻り値
     ///
     /// 野菜
-    async fn find_by_id(&self, id: VegetableId) -> anyhow::Result<Option<Vegetable>> {
+    async fn find_by_id(&self, id: VegetableId) -> DomainResult<Option<Vegetable>> {
         let veg = sqlx::query_as!(
             PlainVegetable,
             r#"
@@ -79,7 +81,8 @@ impl VegetableRepository for PgVegetableRepository {
             id.value(),
         )
         .fetch_optional(&self.pool)
-        .await?;
+        .await
+        .map_err(|e| DomainError::Unexpected(e.into()))?;
 
         Ok(veg.map(|v| v.into()))
     }
@@ -89,7 +92,7 @@ impl VegetableRepository for PgVegetableRepository {
     /// # 戻り値
     ///
     /// 野菜のベクタ
-    async fn find_all(&self) -> anyhow::Result<Vec<Vegetable>> {
+    async fn find_all(&self) -> DomainResult<Vec<Vegetable>> {
         let records = sqlx::query_as!(
             PlainVegetable,
             r#"
@@ -99,7 +102,8 @@ impl VegetableRepository for PgVegetableRepository {
             "#,
         )
         .fetch_all(&self.pool)
-        .await?;
+        .await
+        .map_err(|e| DomainError::Unexpected(e.into()))?;
 
         Ok(records.into_iter().map(|v| v.into()).collect())
     }
@@ -113,9 +117,9 @@ impl VegetableRepository for PgVegetableRepository {
     /// # 戻り値
     ///
     /// 登録した野菜
-    async fn register(&self, vegetable: UpsertVegetable) -> anyhow::Result<Vegetable> {
+    async fn register(&self, vegetable: UpsertVegetable) -> DomainResult<Vegetable> {
         let id = Uuid::new_v4();
-        let mut tx = self.pool.begin().await?;
+        let mut tx = begin_transaction(&self.pool).await?;
         let veg = {
             sqlx::query_as!(
                 PlainVegetable,
@@ -129,9 +133,10 @@ impl VegetableRepository for PgVegetableRepository {
                 vegetable.unit_price.value() as i32,
             )
             .fetch_one(&mut *tx)
-            .await?
+            .await
+            .map_err(|e| DomainError::Unexpected(e.into()))?
         };
-        tx.commit().await?;
+        commit_transaction(tx).await?;
 
         Ok(veg.into())
     }
@@ -150,8 +155,8 @@ impl VegetableRepository for PgVegetableRepository {
         &self,
         id: VegetableId,
         vegetable: UpsertVegetable,
-    ) -> anyhow::Result<Option<Vegetable>> {
-        let mut tx = self.pool.begin().await?;
+    ) -> DomainResult<Option<Vegetable>> {
+        let mut tx = begin_transaction(&self.pool).await?;
         let veg = {
             sqlx::query_as!(
                 PlainVegetable,
@@ -166,9 +171,10 @@ impl VegetableRepository for PgVegetableRepository {
                 vegetable.unit_price.value() as i32,
             )
             .fetch_optional(&mut *tx)
-            .await?
+            .await
+            .map_err(|e| DomainError::Unexpected(e.into()))?
         };
-        tx.commit().await?;
+        commit_transaction(tx).await?;
 
         match veg {
             Some(v) => Ok(Some(v.into())),
@@ -190,7 +196,7 @@ impl VegetableRepository for PgVegetableRepository {
         &self,
         id: VegetableId,
         vegetable: PartialVegetable,
-    ) -> anyhow::Result<Option<Vegetable>> {
+    ) -> DomainResult<Option<Vegetable>> {
         if vegetable.name.is_none() && vegetable.unit_price.is_none() {
             return self.find_by_id(id).await;
         }
@@ -210,14 +216,15 @@ impl VegetableRepository for PgVegetableRepository {
         builder.push_bind(id.value());
         builder.push(" RETURNING id, name, unit_price, created_at, updated_at");
 
-        let mut tx = self.pool.begin().await?;
+        let mut tx = begin_transaction(&self.pool).await?;
         let veg = {
             builder
                 .build_query_as::<PlainVegetable>()
                 .fetch_optional(&mut *tx)
-                .await?
+                .await
+                .map_err(|e| DomainError::Unexpected(e.into()))?
         };
-        tx.commit().await?;
+        commit_transaction(tx).await?;
 
         match veg {
             Some(v) => Ok(Some(v.into())),
@@ -234,8 +241,8 @@ impl VegetableRepository for PgVegetableRepository {
     /// # 戻り値
     ///
     /// 影響した行数。
-    async fn delete(&self, id: VegetableId) -> anyhow::Result<u32> {
-        let mut tx = self.pool.begin().await?;
+    async fn delete(&self, id: VegetableId) -> DomainResult<u32> {
+        let mut tx = begin_transaction(&self.pool).await?;
         let result = {
             sqlx::query!(
                 r#"
@@ -245,10 +252,10 @@ impl VegetableRepository for PgVegetableRepository {
                 id.value(),
             )
             .execute(&mut *tx)
-            .await?
+            .await
+            .map_err(|e| DomainError::Unexpected(e.into()))?
         };
-
-        tx.commit().await?;
+        commit_transaction(tx).await?;
 
         Ok(result.rows_affected() as u32)
     }

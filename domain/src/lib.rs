@@ -3,8 +3,17 @@ pub mod repositories;
 
 use std::borrow::Cow;
 
+/// ドメインエラー
 #[derive(thiserror::Error, Debug)]
 pub enum DomainError {
-    #[error("ドメインルール違反: {0}")]
-    Rule(Cow<'static, str>),
+    /// バリデーションエラー
+    #[error("バリデーションエラー: {0}")]
+    Validation(Cow<'static, str>),
+
+    /// 予期しないエラー
+    #[error(transparent)]
+    Unexpected(#[from] anyhow::Error),
 }
+
+/// ドメイン結果
+pub type DomainResult<T> = Result<T, DomainError>;

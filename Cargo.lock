@@ -2095,6 +2095,10 @@ dependencies = [
 [[package]]
 name = "usecase"
 version = "0.1.0"
+dependencies = [
+ "domain",
+ "thiserror",
+]
 
 [[package]]
 name = "uuid"
