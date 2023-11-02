@@ -6,11 +6,8 @@ edition = "2021"
 [dependencies]
 actix-web = "4.4.*"
 anyhow = "1.0.*"
-controller = { path = "../controller" }
-domain = { path = "../domain" }
 dotenvy = "0.15.*"
 env_logger = "0.10.*"
-infrastructure = { path = "../infrastructure" }
 sqlx = { version = "0.7.*", features = [
     "runtime-tokio-rustls",
     "macros",
@@ -19,4 +16,8 @@ sqlx = { version = "0.7.*", features = [
     "time",
 ] }
 tokio = { version = "1.33.*", features = ["macros", "rt-multi-thread"] }
+
+domain = { path = "../domain" }
 usecase = { path = "../usecase" }
+infrastructure = { path = "../infrastructure" }
+controller = { path = "../controller" }

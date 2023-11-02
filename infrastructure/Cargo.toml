@@ -6,7 +6,6 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.*"
 async-trait = "0.1.*"
-domain = { path = "../domain" }
 sqlx = { version = "0.7.*", features = [
     "runtime-tokio-rustls",
     "macros",
@@ -15,6 +14,8 @@ sqlx = { version = "0.7.*", features = [
     "time",
 ] }
 time = { version = "0.3.*", features = ["serde"] }
-usecase = { path = "../usecase" }
 uuid = { version = "1.5.*", features = ["v4", "serde"] }
 serde = { version = "1.0.*", features = ["derive"] }
+
+domain = { path = "../domain" }
+usecase = { path = "../usecase" }

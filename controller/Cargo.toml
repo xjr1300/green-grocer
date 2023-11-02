@@ -6,10 +6,11 @@ edition = "2021"
 [dependencies]
 actix-web = { version = "4.4.*", features = ["macros"] }
 anyhow = "1.0.*"
-domain = { path = "../domain" }
-infrastructure = { path = "../infrastructure" }
 serde = { version = "1.0.*", features = ["derive"] }
 serde_json = "1.0.*"
 time = { version = "0.3.*", features = ["serde"] }
-usecase = { path = "../usecase" }
 uuid = { version = "1.5.*", features = ["v4", "serde"] }
+
+domain = { path = "../domain" }
+usecase = { path = "../usecase" }
+infrastructure = { path = "../infrastructure" }
